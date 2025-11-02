@@ -1,0 +1,5 @@
+{
+  "name": "Connect Four Game",
+  "description": "A fully playable, single-file HTML, CSS, and JavaScript implementation of the classic two-player game Connect Four. Features a visually striking dark theme, smooth animations, and is fully responsive for both mobile and desktop play.",
+  "requestFramePermissions": []
+}

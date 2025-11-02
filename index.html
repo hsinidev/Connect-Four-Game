@@ -1,0 +1,856 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connect Four - Unbeatable 3D Blueprint | Play Online</title>
+    
+    <!-- SEO Metadata --><meta name="description" content="Play the classic game of Connect Four online for free. Read the comprehensive blueprint for developing an unbeatable 3D version using React, WebGL, and Minimax AI.">
+    <meta name="keywords" content="connect four, connect 4, online game, board game, strategy game, free game, 3D Game, React, WebGL, Minimax Algorithm, Connect4Logic, SEO">
+    <meta name="author" content="HSINI MOHAMED (Conceptual)">
+    
+    <!-- JSON-LD Schema for BlogPosting and VideoGame (Combined) --><script type="application/ld+json">
+    [
+    {
+        "@context": "https://schema.org",
+        "@type": "VideoGame",
+        "name": "Connect Four",
+        "description": "A free, browser-based implementation of the classic two-player strategy board game, Connect Four.",
+        "gamePlatform": "Web Browser",
+        "applicationCategory": "Game",
+        "offers": {
+            "@type": "Offer",
+            "price": "0"
+        }
+    },
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://example.com/3d-connect4-blueprint" 
+        },
+        "headline": "Unlocking the Code: Building an Unbeatable 3D Connect 4 Game Blueprint",
+        "image": "https://placehold.co/1200x630/000/fff?text=3D+Connect+4+Blueprint",
+        "datePublished": "2025-11-02T08:00:00+08:00",
+        "dateModified": "2025-11-02T16:00:00+08:00",
+        "author": {
+            "@type": "Person",
+            "name": "HSINI MOHAMED (Conceptual)"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "GameDev Insights",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://placehold.co/600x60/000/fff?text=Logo"
+            }
+        },
+        "description": "A deep dive into architecting a high-performance, interactive 3D Connect 4 web application, focusing on the separation of game logic from the WebGL presentation layer."
+    }
+    ]
+    </script>
+
+    <!-- Load Tailwind CSS for Article Styling --><script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        :root {
+            --board-bg: #0d47a1; /* Deep blue */
+            --cell-bg: #0d253f; /* Darker blue for empty cells */
+            --player1-color: #ef4444; /* Red */
+            --player2-color: #facc15; /* Yellow */
+            --background-start: #1e293b; /* Slate 800 */
+            --background-end: #0f172a; /* Slate 900 */
+            --text-color: #e2e8f0;
+            --border-color: #475569;
+            --win-highlight: rgba(255, 255, 255, 0.3);
+            --button-primary-bg: #4f46e5;
+            --button-primary-hover-bg: #6366f1;
+        }
+
+        /* GALAXY ANIMATION KEYFRAMES (Used for both body and article container) */
+        @keyframes galaxy-shift {
+            0% { background-position: 0% 0%; }
+            50% { background-position: 100% 100%; }
+            100% { background-position: 0% 0%; }
+        }
+
+        /* Base game styles */
+        @keyframes dropIn {
+            from { transform: translateY(-200px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            
+            /* UPDATED: Apply galaxy background to the entire body */
+            background: linear-gradient(135deg, #0f172a, #33104a, #0d47a1, #33104a, #0f172a);
+            background-size: 400% 400%;
+            animation: galaxy-shift 30s ease infinite;
+            
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1.5rem;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        header, main, footer, #article-container {
+            width: 100%;
+            max-width: 800px; 
+            z-index: 10; /* Ensure content stays above the background */
+        }
+
+        header {
+            animation: fadeIn 0.5s ease-out;
+            margin-bottom: 1.5rem;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 8vw, 3.5rem);
+            margin: 0 0 0.5rem 0;
+            text-shadow: 2px 2px 6px rgba(0,0,0,0.5);
+        }
+
+        .intro {
+            font-size: clamp(1rem, 3vw, 1.1rem);
+            color: #94a3b8; 
+            max-width: 500px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+
+        main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        /* --- Game Board Styles --- */
+        #turn-indicator {
+            font-size: clamp(1rem, 3vw, 1.25rem);
+            font-weight: bold;
+            padding: 0.5rem 1.5rem;
+            border-radius: 999px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        #turn-indicator.player1 {
+            background-color: var(--player1-color);
+            color: white;
+        }
+        #turn-indicator.player2 {
+            background-color: var(--player2-color);
+            color: #333;
+        }
+
+        #board-container {
+            padding: clamp(0.5rem, 2vw, 1rem);
+            /* Keep board blue for contrast against the galaxy background */
+            background-color: var(--board-bg); 
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3), inset 0 0 15px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 600px;
+        }
+
+        #board {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            grid-template-rows: repeat(6, 1fr);
+            gap: clamp(0.5rem, 2vw, 1rem);
+            aspect-ratio: 7 / 6;
+            cursor: pointer;
+        }
+
+        .cell {
+            position: relative;
+        }
+
+        .cell::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: 50%;
+            background-color: var(--cell-bg);
+            box-shadow: inset 0 3px 5px rgba(0,0,0,0.4);
+            transition: background-color 0.3s ease;
+        }
+        
+        .cell:not(.player1):not(.player2):hover::before {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .cell.player1::before {
+            background-color: var(--player1-color);
+            animation: dropIn 0.4s ease-out;
+        }
+
+        .cell.player2::before {
+            background-color: var(--player2-color);
+            animation: dropIn 0.4s ease-out;
+        }
+        
+        .cell.win::before {
+            box-shadow: 0 0 0 5px var(--win-highlight), inset 0 3px 5px rgba(0,0,0,0.4);
+        }
+
+        .btn {
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            padding: 0.75rem 2rem;
+            border: none;
+            background-color: var(--button-primary-bg);
+            color: white;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            transition: background-color 0.2s, transform 0.2s;
+        }
+
+        .btn:hover {
+            background-color: var(--button-primary-hover-bg);
+            transform: translateY(-2px);
+        }
+        
+        /* --- Footer and Article Styles --- */
+        footer {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            width: 100%;
+            max-width: 650px;
+        }
+        
+        #how-to-play h2 {
+            font-size: clamp(1.2rem, 4vw, 1.5rem);
+            margin-top: 0;
+            margin-bottom: 1rem;
+        }
+
+        #how-to-play ul {
+            list-style: none;
+            padding: 0;
+            margin: 0 auto;
+            max-width: 450px;
+            text-align: left;
+            color: var(--text-color);
+        }
+
+        #how-to-play li {
+            margin-bottom: 0.5rem;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            line-height: 1.5;
+        }
+        
+        /* Modal (Win Message) Styles remain the same */
+        #win-message {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        #win-message.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        #win-message-content {
+            background: var(--background-end);
+            padding: 2rem 3rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            text-align: center;
+            border: 2px solid var(--border-color);
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        #win-text {
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            margin-bottom: 1.5rem;
+            font-weight: bold;
+        }
+
+        /* --- Custom styles for the SEO Article Content --- */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+        /* NEW: Style for inline code snippets */
+        #full-article-content code:not([class*="block"]) {
+            color: #facc15; /* Vibrant Yellow */
+            font-weight: 600;
+            padding: 0.1em 0.4em;
+            background-color: rgba(0, 0, 0, 0.4);
+            border-radius: 5px;
+            font-family: 'ui-monospace', 'SFMono-Regular', Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+        }
+
+        /* Article Container - Shares GALAXY BOX styling with the body, ensuring smooth transition */
+        #article-container {
+            margin-top: 4rem;
+            margin-bottom: 2rem;
+            
+            /* REMOVED BORDERS, SHADOWS, AND BOX STYLING */
+            border-radius: 0;
+            box-shadow: none;
+            padding: 2rem;
+            text-align: left; 
+            width: 100%;
+            max-width: 800px;
+            
+            /* ADDED CONTRAST BACKGROUND FOR TEXT */
+            background: rgba(0, 0, 0, 0.4); 
+            
+            color: var(--text-color); 
+        }
+
+        /* Inner Content is now just text on a semi-transparent layer */
+        #full-article-content {
+            padding: 0;
+            transition: max-height 0.7s ease-in-out, opacity 0.7s ease-in-out;
+            overflow: hidden;
+            opacity: 0;
+            max-height: 0;
+        }
+        
+        #full-article-content.show {
+            max-height: 50000px; /* Large value to accommodate all content */
+            opacity: 1;
+        }
+
+        /* Update ALL TEXT INSIDE ARTICLE to be light for readability against the dark galaxy */
+        #full-article-content,
+        #full-article-content p, 
+        #full-article-content li {
+            color: #e2e8f0; 
+            line-height: 1.7;
+        }
+
+        #full-article-content header, 
+        #full-article-content h1, 
+        #full-article-content h2, 
+        #full-article-content h3, 
+        #full-article-content h4 {
+            color: #fff; 
+            text-shadow: 0 0 5px rgba(0,0,0,0.8);
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        /* Table of Contents Styling Update */
+        .toc-link {
+            transition: color 0.2s;
+            color: #93c5fd; 
+        }
+        .toc-link:hover {
+            color: #facc15; 
+        }
+        
+        /* --- STYLING FOR INNER BOXES (TOC, FAQ, CONTROLS, TABLE) --- */
+        /* Changed from opaque box to a clean, transparent, blurred element */
+        .inner-galaxy-box {
+            background-color: rgba(255, 255, 255, 0.1); 
+            backdrop-filter: blur(5px); 
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            color: #fff;
+            margin-bottom: 1.5rem; /* Add margin below the box */
+        }
+        
+        .inner-galaxy-box h2, .inner-galaxy-box h4 {
+            color: #fff;
+            text-shadow: none; 
+        }
+        /* --- END STYLING FOR INNER BOXES --- */
+
+        /* Code Block Update for dark mode readability */
+        .code-block {
+            background-color: #0f172a; 
+            color: #a5f3fc; 
+        }
+
+        /* Custom style for the gold link */
+        .powered-by {
+            font-size: 0.8rem;
+            margin-top: 1.5rem;
+            color: #FFD700; 
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5); 
+        }
+        .powered-by a {
+            color: #FFD700; 
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.2s;
+        }
+        .powered-by a:hover {
+            color: #FFEA00; 
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Connect Four</h1>
+        <p class="intro">The classic two-player game of strategy. Drop your discs in the grid and be the first to get four in a row to win!</p>
+    </header>
+
+    <main>
+        <div id="turn-indicator"></div>
+        <div id="board-container">
+            <div id="board"></div>
+        </div>
+        <button id="new-game-btn" class="btn">New Game</button>
+    </main>
+    
+    <footer>
+        <section id="how-to-play">
+            <h2>How to Play (Current Game)</h2>
+            <ul>
+                <li><strong>OBJECTIVE:</strong> To be the first player to get four of your colored discs in a row.</li>
+                <li><strong>GAMEPLAY:</strong> Players take turns dropping one of their discs from the top into any of the seven columns.</li>
+                <li><strong>WINNING:</strong> A "four-in-a-row" can be horizontal, vertical, or diagonal.</li>
+                <li><strong>DRAW:</strong> The game is a draw if all 42 slots are filled and no one has won. Good luck!</li>
+            </ul>
+        </section>
+        
+        <!-- Read More Button for the SEO Article (Simplified) --><div class="mt-8 mb-4 text-center">
+             <button id="read-more-button" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-300 ease-in-out">
+                Read More
+            </button>
+        </div>
+        
+        <!-- Updated: Powered by HSINI MOHAMED in gold --><p class="powered-by">Powered by <a href="https://github.com/hsinidev" target="_blank" rel="noopener noreferrer">HSINI MOHAMED</a></p>
+    </footer>
+
+    <!-- START OF SEO BLOG POST ARTICLE --><div id="article-container" class="max-w-4xl mx-auto rounded-xl">
+        
+        <!-- Full Article Content (Controlled by JS for smooth dropdown) --><div id="full-article-content" class="hidden">
+            
+            <header class="mb-8 border-b pb-4">
+                <h1 class="text-4xl font-extrabold mb-2">Unlocking the Code: Building an Unbeatable 3D Connect 4 Game Blueprint</h1>
+                <p class="text-lg">A Deep Dive into Pure Logic, React, and GPU-Accelerated WebGL</p>
+            </header>
+
+            <p class="mb-6 text-xl leading-relaxed">Connect 4. It's a game of seemingly simple rules that hides a profound depth of strategy, one that is famously "solved" but endlessly fascinating. Two players, one vertical grid, and the challenge: achieve four in a row while blocking your opponent. But what if we took this classic, gravity-driven contest and lifted it into a **spectacular, GPU-accelerated 3D environment**? This article is your detailed blueprint for architecting an **unbeatable 3D Connect 4 game** that runs flawlessly in any modern browser.</p>
+
+            <!-- Table of Contents --><section class="mb-10 inner-galaxy-box">
+                <h2 class="text-2xl font-bold mb-4">Table of Contents</h2>
+                <nav class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-sm">
+                    <a href="#logic-essence" class="toc-link">1. GAME INFO: The Essence of Connect 4 Logic</a>
+                    <a href="#what-is-connect4" class="toc-link ml-4">1.1. What Is Connect 4</a>
+                    <a href="#gameplay-architecture" class="toc-link ml-4">1.2. Gameplay & Architecture</a>
+                    <a href="#platform-stack" class="toc-link">2. Platform and Technology Stack</a>
+                    <a href="#3d-interaction" class="toc-link">3. How to Play Our 3D Connect 4</a>
+                    <a href="#controls" class="toc-link ml-4">3.1. Controls Breakdown</a>
+                    <a href="#desktop-controls" class="toc-link ml-6">3.1.1. Desktop Controls</a>
+                    <a href="#mobile-controls" class="toc-link ml-6">3.1.2. Mobile Controls</a>
+                    <a href="#strategic-tips" class="toc-link">4. Tips and Tricks for Connect 4 (Strategy)</a>
+                    <a href="#core-features" class="toc-link">5. Features of 3D Connect 4</a>
+                    <a href="#unlockables" class="toc-link">6. Unlockables & Future Development</a>
+                    <a href="#download" class="toc-link">7. Download Connect 4 (Source Code)</a>
+                    <a href="#faq" class="toc-link">8. FAQ About Connect 4</a>
+                    <a href="#similar-games" class="toc-link">9. Similar Games</a>
+                    <a href="#game-details" class="toc-link">10. Game Details Summary</a>
+                    <a href="#final-thoughts" class="toc-link">11. Final Thoughts</a>
+                </nav>
+            </section>
+            
+            <!-- 1. GAME INFO: The Essence of Connect 4 Logic --><h2 class="text-3xl font-bold mb-6 border-b pb-2" id="logic-essence">1. GAME INFO: The Essence of Connect 4 Logic</h2>
+            <p class="mb-4">The shift from Tic Tac Toe to Connect 4 introduces two core complexities: a larger board (6x7, or 42 cells) and the essential **gravity mechanic**. This makes the logic exponentially more complex to process but remains the core challenge in building an AI-powered version.</p>
+
+            <h3 class="text-2xl font-semibold mb-4" id="what-is-connect4">1.1. What Is Connect 4</h3>
+            <p class="mb-4">Connect 4 is a two-player, solved game. When played optimally, the first player (Red) can always win. Our goal is to encapsulate the rules and state management into a pure, UI-agnostic TypeScript class: <code>Connect4Logic</code>. This architectural separation ensures that the complex game-solving algorithms are completely decoupled from the rendering layer (WebGL). This is the secret to a highly performant and testable game.</p>
+            <p class="mb-6">By isolating the logic, we achieve the holy trinity of professional software development: **Testability**, **Reusability**, and **Maintainability**. Any bug in the win condition checks is confined to the <code>Connect4Logic</code> class, saving massive debugging time.</p>
+            
+            <h3 class="text-2xl font-semibold mb-4" id="gameplay-architecture">1.2. Gameplay & Architecture</h3>
+            <p class="mb-4">The entire game flow hinges on two primary methods within our <code>Connect4Logic</code> core:</p>
+            <ul class="list-disc list-inside space-y-2 mb-4 ml-4">
+                <li><strong><code>initializeGame()</code></strong>: Generates the empty 6x7 board state and sets the starting player (Red).</li>
+                <li><strong><code>dropPiece(col: number)</code></strong>: This is the critical method. It must first determine the lowest available row in the specified column before placing the piece. If the column is full, the move is invalidated. After a valid move, it updates the board, switches the active player, and crucially calls the check for a win.</li>
+            </ul>
+            <p class="mb-4">The complexity lies in the **<code>checkForWin()</code>** method. Unlike Tic Tac Toe's 8 checks, Connect 4 requires checking 4-in-a-row across the 42-cell board in four directions: horizontal, vertical, and both positive and negative diagonals. This method is performance-critical, as it runs after every single move, and must be optimized for speed.</p>
+            
+            <p class="mb-6"><strong>The Unbeatable AI:</strong> To make the game truly challenging, the <code>Connect4Logic</code> must house the AI. Given the board size, a **Minimax algorithm** with Alpha-Beta Pruning is essential. This algorithm searches several moves ahead to find the optimal path. For Connect 4, due to its solved nature, the search depth must be sufficient to guarantee a first-player win or a forced draw if the first player makes a mistake. This complex computational engine lives entirely within the pure logic core, never touching the 3D rendering code.</p>
+
+            <h2 class="text-3xl font-bold mb-6 border-b pb-2 mt-10" id="platform-stack">2. Platform and Technology Stack</h2>
+            <p class="mb-4">This 3D Connect 4 application is a showcase for the modern web stack, emphasizing performance and developer experience. It is a browser-based, **GPU-accelerated experience** that requires no downloads or plugins beyond a WebGL-compatible browser.</p>
+            
+            <ul class="list-disc list-inside space-y-3 mb-6 ml-4">
+                <li><strong>React & TypeScript:</strong> Provides the declarative structure and essential type safety for managing the complex 6x7 board state.</li>
+                <li><strong>WebGL via <code>@react-three/fiber</code>:</strong> This library is the bridge, allowing us to build the 3D scene using familiar React components. We define the board and the pieces as JSX elements, letting the library handle the complex imperative API calls to Three.js and the underlying WebGL.</li>
+                <li><strong><code>@react-three/drei</code>:</strong> Used for common utilities, like dynamic camera controls (OrbitControls) and lighting setups, vastly speeding up 3D development.</li>
+                <li><strong>Tailwind CSS:</strong> Ensures the 2D user interface (scoreboards, buttons, messages) is fully responsive and modern.</li>
+            </ul>
+            <p class="mb-6">The key architectural decision here is the use of <code>react-three-fiber</code> to manage the **falling pieces animation**. When the <code>dropPiece(col)</code> method in <code>Connect4Logic</code> validates a move and returns the target row, the React component uses this data to trigger a physics-based animation, making the piece visually fall into the slot before solidifying its position in the game state. This blend of pure logic and rich animation defines the user experience.</p>
+            
+            <!-- 3. How to Play Our 3D Connect 4 --><h2 class="text-3xl font-bold mb-6 border-b pb-2 mt-10" id="3d-interaction">3. How to Play Our 3D Connect 4</h2>
+            <p class="mb-4">The interaction is designed to make the 3D environment intuitive. You can fully manipulate the camera to inspect the board, crucial for spotting diagonal threats, while the actual move placement remains simple and focused on the column.</p>
+
+            <h3 class="text-2xl font-semibold mb-4" id="controls">3.1. Controls Breakdown</h3>
+            <div class="grid md:grid-cols-2 gap-8 mb-6">
+                <div class="inner-galaxy-box" id="desktop-controls">
+                    <h5 class="font-bold text-xl mb-3">3.1.1. Desktop Controls</h5>
+                    <ul class="list-disc list-inside space-y-2">
+                        <li><strong>Placing a Piece:</strong> Hover your cursor over the top of any open column. The column will highlight. Click the left mouse button to drop your disc.</li>
+                        <li><strong>Camera Rotation (Orbit):</strong> Click and hold the left mouse button anywhere on the background (off the grid) and drag to orbit the camera around the 3D board.</li>
+                        <li><strong>Camera Pan:</strong> Click and hold the right mouse button and drag to pan the camera left, right, up, and down.</li>
+                        <li><strong>Zoom:</strong> Use the mouse scroll wheel to zoom in and out, useful for viewing the top and bottom of the grid clearly.</li>
+                    </ul>
+                </div>
+                <div class="inner-galaxy-box" id="mobile-controls">
+                    <h5 class="font-bold text-xl mb-3">3.1.2. Mobile Controls</h5>
+                    <ul class="list-disc list-inside space-y-2">
+                        <li><strong>Placing a Piece:</strong> Tap directly on the top area of an empty column to drop your piece.</li>
+                        <li><strong>Camera Rotation (Orbit):</strong> Place one finger on the screen (off the grid) and drag to orbit the camera.</li>
+                        <li><strong>Zoom (Pinch):</strong> Use the standard two-finger "pinch" gesture to zoom the view.</li>
+                        <li><strong>Camera Pan:</strong> Place two fingers on the screen and drag them together to pan the camera.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 4. Tips and Tricks for Connect 4 --><h2 class="text-3xl font-bold mb-6 border-b pb-2 mt-10" id="strategic-tips">4. Tips and Tricks for Connect 4 (Advanced Strategy)</h2>
+            <p class="mb-4">Connect 4 is a solved game, making strategy critical. Against a weak opponent, these tips guarantee a win. Against our unbeatable AI, they are essential to force a draw when playing second.</p>
+            
+            <h4 class="text-xl font-semibold mt-6 mb-3">The Power of the Center Column (Column 4)</h4>
+            <p class="mb-4">The center column (Column 4, or D) is the most powerful position, participating in the highest number of potential winning lines (vertical, horizontal, and four diagonals). **The opening move should always be in the center column.** If you play first and take the center, you gain a massive advantage and often control the game's tempo. If you play second, you must block the center on your first move.</p>
+
+            <h4 class="text-xl font-semibold mt-6 mb-3">Forcing a Win (The Winning Ladder)</h4>
+            <p class="mb-4">A key strategy is creating a "Winning Ladder" or **Threat 4**. This involves building three pieces in a row with open spaces at both ends, forcing your opponent to block. The most advanced concept is the **"Threat-in-the-Sky"**, where you create a potential four-in-a-row at a higher level, but the opponent cannot block it because they cannot drop a piece to that exact height. You essentially force them to play below your threat, securing the next move to win.</p>
+            
+            <h4 class="text-xl font-semibold mt-6 mb-3">The Odd/Even Column Principle</h4>
+            <p class="mb-4">This is an advanced strategy based on **parity**. If the total number of playable slots remaining is odd, the current player has a slight theoretical advantage. The simplest application is controlling which player gets the final move into a key winning slot. By prioritizing moves into odd-numbered columns (1, 3, 5, 7) or even-numbered columns (2, 4, 6), you can manipulate the board state to ensure you drop the winning piece.</p>
+
+            <h4 class="text-xl font-semibold mt-6 mb-3">Creating a "Double Threat" (Fork)</h4>
+            <p class="mb-4">Similar to a fork in chess, a double threat in Connect 4 creates two simultaneous winning lines (e.g., one vertical line of three and one horizontal line of three) that mature on your next move. Since the opponent can only block one, the other threat guarantees your win.</p>
+            
+            <h4 class="text-xl font-semibold mt-6 mb-3">Defense: Blocking the Diagonals</h4>
+            <p class="mb-6">Diagonals are often the hardest to spot, especially in a 3D environment where perspective can be tricky. Always rotate the board using the camera controls to quickly check all four corners and the central diagonal paths. An opponent will often use an inconspicuous diagonal as the setup for a double threat. Master defensive diagonal scanning.</p>
+
+            <!-- 5. Features of 3D Connect 4 --><h2 class="text-3xl font-bold mb-6 border-b pb-2 mt-10" id="core-features">5. Features of 3D Connect 4</h2>
+            <p class="mb-4">Our blueprint provides more than just a functional game; it defines an immersive, feature-rich experience built on a robust framework:</p>
+            <ul class="list-disc list-inside space-y-3 mb-6 ml-4">
+                <li><strong>Pure Logic Core (<code>Connect4Logic</code>):</strong> Flawless rule enforcement and state management, fully separated from the UI for maximum testability.</li>
+                <li><strong>GPU-Accelerated 3D Visuals:</strong> The board and discs are rendered using WebGL, allowing for dynamic lighting, shadow casting, and metallic textures via <code>react-three-fiber</code>.</li>
+                <li><strong>Physics-Based Piece Animation:</strong> Discs realistically "fall" into place, giving immediate visual feedback that enhances the core gravity mechanic.</li>
+                <li><strong>Unbeatable AI Modes:</strong> Utilizes a Minimax algorithm with tunable depth, offering difficulty levels from Easy to Expert/Unbeatable.</li>
+                <li><strong>Full Camera Interactivity:</strong> Enables players to rotate, pan, and zoom the 3D scene, essential for comprehensive strategic viewing.</li>
+                <li><strong>Real-Time State Management:</strong> Clear display of the current player, win state, and forced draws.</li>
+                <li><strong>Cross-Platform Responsiveness:</strong> Optimized for all devices—desktop, tablet, and mobile—using responsive design principles.</li>
+                <li><strong>Source Code Accessibility:</strong> The entire blueprint is designed for open-source sharing and community extension.</li>
+            </ul>
+            
+            <!-- 6. Unlockables & Future Development --><h2 class="text-3xl font-bold mb-6 border-b pb-2 mt-10" id="unlockables">6. Unlockables & Future Development</h2>
+            <p class="mb-4">The decoupled architecture means future feature additions are purely cosmetic and non-disruptive to the core gameplay logic. This allows for rich expansion:</p>
+            <ul class="list-disc list-inside space-y-3 mb-6 ml-4">
+                <li><strong>Custom Disc Models:</strong> Unlockable 3D models for discs (e.g., futuristic orbs, ancient coins, stylized gems).</li>
+                <li><strong>Themed Board Skins:</strong> Changing the 3D environment to themes like 'Space Station', 'Jungle Ruins', or 'Classic Wood'.</li>
+                <li><strong>Soundscapes and SFX:</strong> Adding spatial audio to the 3D scene, with unique sounds for piece drops and wins.</li>
+                <li><strong>Multiplayer Implementation:</strong> Integrating **Firebase Firestore** to manage real-time game state, allowing two authenticated users to compete across the web. The <code>Connect4Logic</code> core would remain the same, handling state updates from both players via database listeners.</li>
+            </ul>
+
+            <!-- 7. Download Connect 4 --><h2 class="text-3xl font-bold mb-6 border-b pb-2 mt-10" id="download">7. Download Connect 4 (Source Code)</h2>
+            <p class="mb-4">For developers interested in exploring the logic or customizing the 3D scene, the project blueprint is structured for easy setup. The power of this project is its openness.</p>
+            <div class="code-block space-y-3 mb-6">
+                <p><strong>Cloning the Project:</strong></p>
+                <code class="block whitespace-pre">git clone https://github.com/hsinidev/3d-connect4.git</code>
+                <p><strong>Install Dependencies (using Node.js and npm):</strong></p>
+                <code class="block whitespace-pre">cd 3d-connect4
+npm install</code>
+                <p><strong>Run Development Server:</strong></p>
+                <code class="block whitespace-pre">npm run dev</code>
+            </div>
+
+            <!-- 8. FAQ About Connect 4 --><h2 class="text-3xl font-bold mb-6 border-b pb-2 mt-10" id="faq">8. FAQ About Connect 4</h2>
+            <div class="space-y-6">
+                <div class="inner-galaxy-box">
+                    <h4 class="font-bold mb-2">Q: Is Connect 4 a solved game, and can the AI truly be "unbeatable"?</h4>
+                    <p>A: Yes. Connect 4 is mathematically solved. The first player (Red) can always win if they make the correct first move and continue playing perfectly. If the second player (Yellow) also plays perfectly, the game will be a forced win for the first player. Our AI utilizes a deep-search Minimax algorithm, which, when set to maximum difficulty, plays perfectly, making it functionally unbeatable.</p>
+                </div>
+                <div class="inner-galaxy-box">
+                    <h4 class="font-bold mb-2">Q: Why use WebGL and <code>react-three-fiber</code> for a simple board game?</h4>
+                    <p>A: While Connect 4 is simple in rules, using WebGL allows for dynamic, high-fidelity graphics (shadows, reflections, real-time lighting) that are impossible with standard CSS. <code>react-three-fiber</code> makes the development of this 3D scene declarative and fits perfectly into the React ecosystem, offering a superior visual experience.</p>
+                </div>
+                <div class="inner-galaxy-box">
+                    <h4 class="font-bold mb-2">Q: What is the benefit of decoupling <code>Connect4Logic</code> from the 3D scene?</h4>
+                    <p>A: Decoupling is the foundation of clean architecture. It allows us to swap out the UI (e.g., from 3D WebGL to a 2D HTML Canvas) without changing the core game rules. More importantly, it allows us to test the complex Minimax AI algorithm separately from the rendering layer, ensuring its accuracy.</p>
+                </div>
+                <div class="inner-galaxy-box">
+                    <h4 class="font-bold mb-2">Q: Can the game be adapted for a larger board (e.g., 8x8)?</h4>
+                    <p>A: Yes, the <code>Connect4Logic</code> class is built using flexible array structures (TypeScript interfaces) and can be adapted. However, scaling up the board size drastically increases the search space for the Minimax AI, requiring significantly more computational power or a reduction in the AI's search depth.</p>
+                </div>
+                <div class="inner-galaxy-box">
+                    <h4 class="font-bold mb-2">Q: What is the primary strategic difference between Connect 4 and Tic Tac Toe?</h4>
+                    <p>A: The gravity mechanic. In Tic Tac Toe, any empty square is immediately playable. In Connect 4, only the bottom-most available slot in a column is playable. This restriction is what allows for complex "threat-in-the-sky" strategies and forces players to control the height of the board, not just the position.</p>
+                </div>
+            </div>
+
+            <!-- 9. Similar Games --><h2 class="text-3xl font-bold mb-6 border-b pb-2 mt-10" id="similar-games">9. Similar Games</h2>
+            <p class="mb-4">The architectural pattern of using a pure logic core (like <code>Connect4Logic</code>) to power a rich UI can be applied to many other strategy and board games:</p>
+            <ul class="list-disc list-inside space-y-3 mb-6 ml-4">
+                <li><strong>Othello (Reversi):</strong> Requires complex capture logic and an advanced AI, perfect for a decoupled logic core.</li>
+                <li><strong>Checkers/Draughts:</strong> Introduces different piece movement, jumping, and kinging rules, all managed by a dedicated logic class.</li>
+                <li><strong>Hex:</strong> A connection game played on a rhombus-shaped grid that is famously non-solvable, offering a unique AI challenge.</li>
+            </ul>
+
+            <!-- 10. Game Details Summary --><h2 class="text-3xl font-bold mb-6 border-b pb-2 mt-10" id="game-details">10. Game Details Summary</h2>
+            <div class="overflow-x-auto mb-6">
+                <table class="min-w-full divide-y divide-gray-200 rounded-lg shadow-md">
+                    <thead class="bg-gray-800 text-white">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider rounded-tl-lg">Detail</th>
+                            <th scope="col" class="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider rounded-tr-lg">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 inner-galaxy-box">
+                        <tr class="hover:bg-blue-900/20">
+                            <td class="px-6 py-4 whitespace-nowrap font-semibold">Title</td>
+                            <td class="px-6 py-4 whitespace-nowrap">3D Connect 4 Blueprint</td>
+                        </tr>
+                        <tr class="hover:bg-blue-900/20">
+                            <td class="px-6 py-4 whitespace-nowrap font-semibold">Developer</td>
+                            <td class="px-6 py-4 whitespace-nowrap">HSINI MOHAMED (Conceptual)</td>
+                        </tr>
+                        <tr class="hover:bg-blue-900/20">
+                            <td class="px-6 py-4 whitespace-nowrap font-semibold">Technology Stack</td>
+                            <td class="px-6 py-4">React, TypeScript, WebGL (<code>react-three-fiber</code>), Minimax AI, Tailwind CSS</td>
+                        </tr>
+                        <tr class="hover:bg-blue-900/20">
+                            <td class="px-6 py-4 whitespace-nowrap font-semibold">Platform</td>
+                            <td class="px-6 py-4 whitespace-nowrap">Web Browser (Desktop & Mobile)</td>
+                        </tr>
+                        <tr class="hover:bg-blue-900/20">
+                            <td class="px-6 py-4 whitespace-nowrap font-semibold">Genre</td>
+                            <td class="px-6 py-4 whitespace-nowrap">Puzzle, Strategy, Board Game</td>
+                        </tr>
+                        <tr class="hover:bg-blue-900/20">
+                            <td class="px-6 py-4 whitespace-nowrap font-semibold">Source Code</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-blue-300">https://github.com/hsinidev/3d-connect4.git (Example link)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 11. Final Thoughts --><h2 class="text-3xl font-bold mb-6 border-b pb-2 mt-10" id="final-thoughts">11. Final Thoughts</h2>
+            <p>We started with the simple goal of detailing a Connect 4 application and ended with a robust blueprint for developing any complex, turn-based game on the modern web. The combination of the **pure, testable <code>Connect4Logic</code> core**—housing the highly computational AI—and the **declarative 3D presentation layer**—powered by React and WebGL—is the defining feature of this project.</p>
+            <p class="mt-4">This architecture not only guarantees a professional, maintainable codebase but also provides the flexibility to create unforgettable digital experiences. I encourage you to use this blueprint, clone the project, and explore how these powerful tools synergize to create a solved game that is nonetheless captivating in three dimensions. The future of interactive web development lies in this clean separation of logic and presentation. Now, go build something unbeatable.</p>
+        </div>
+    </div>
+    <!-- END OF SEO BLOG POST ARTICLE --><div id="win-message">
+        <div id="win-message-content">
+            <div id="win-text"></div>
+            <button id="play-again-btn" class="btn">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const ROWS = 6;
+            const COLS = 7;
+            
+            let board = [];
+            let currentPlayer = 1;
+            let gameOver = false;
+
+            const boardElement = document.getElementById('board');
+            const turnIndicator = document.getElementById('turn-indicator');
+            const newGameBtn = document.getElementById('new-game-btn');
+            const playAgainBtn = document.getElementById('play-again-btn');
+            const winMessageElement = document.getElementById('win-message');
+            const winTextElement = document.getElementById('win-text');
+            
+            // --- Article Toggle Variables ---
+            const readMoreButton = document.getElementById('read-more-button');
+            const fullArticleContent = document.getElementById('full-article-content');
+
+
+            function createBoard() {
+                board = Array.from({ length: ROWS }, () => Array(COLS).fill(0));
+                boardElement.innerHTML = '';
+                for (let r = 0; r < ROWS; r++) {
+                    for (let c = 0; c < COLS; c++) {
+                        const cell = document.createElement('div');
+                        cell.classList.add('cell');
+                        cell.dataset.col = c;
+                        cell.dataset.row = r;
+                        boardElement.appendChild(cell);
+                    }
+                }
+            }
+
+            function updateTurnIndicator() {
+                turnIndicator.textContent = `Player ${currentPlayer}'s Turn`;
+                turnIndicator.className = `player${currentPlayer}`;
+            }
+
+            function handleColumnClick(e) {
+                if (gameOver) return;
+
+                const target = e.target.closest('.cell');
+                if (!target) return;
+
+                const col = parseInt(target.dataset.col, 10);
+
+                for (let r = ROWS - 1; r >= 0; r--) {
+                    if (board[r][col] === 0) {
+                        dropPiece(r, col);
+                        return;
+                    }
+                }
+            }
+            
+            function dropPiece(row, col) {
+                board[row][col] = currentPlayer;
+                const cell = document.querySelector(`[data-row='${row}'][data-col='${col}']`);
+                cell.classList.add(`player${currentPlayer}`);
+
+                if (checkWin(row, col)) {
+                    endGame(false);
+                } else if (checkDraw()) {
+                    endGame(true);
+                } else {
+                    switchPlayer();
+                }
+            }
+
+            function switchPlayer() {
+                currentPlayer = currentPlayer === 1 ? 2 : 1;
+                updateTurnIndicator();
+            }
+
+            function checkWin(row, col) {
+                const player = board[row][col];
+                
+                const directions = [
+                    { r: 0, c: 1 },  // Horizontal
+                    { r: 1, c: 0 },  // Vertical
+                    { r: 1, c: 1 },  // Diagonal \
+                    { r: 1, c: -1 }  // Diagonal /
+                ];
+                
+                let winningCells = [];
+
+                for (const dir of directions) {
+                    let count = 1;
+                    let currentWinningCells = [{row, col}];
+                    
+                    // Check in positive direction
+                    for (let i = 1; i < 4; i++) {
+                        const r = row + i * dir.r;
+                        const c = col + i * dir.c;
+                        if (r >= 0 && r < ROWS && c >= 0 && c < COLS && board[r][c] === player) {
+                            count++;
+                            currentWinningCells.push({row: r, col: c});
+                        } else {
+                            break;
+                        }
+                    }
+
+                    // Check in negative direction
+                    for (let i = 1; i < 4; i++) {
+                        const r = row - i * dir.r;
+                        const c = col - i * dir.c;
+                        if (r >= 0 && r < ROWS && c >= 0 && c < COLS && board[r][c] === player) {
+                            count++;
+                            currentWinningCells.push({row: r, col: c});
+                        } else {
+                            break;
+                        }
+                    }
+
+                    if (count >= 4) {
+                        winningCells = currentWinningCells;
+                        highlightWinningCells(winningCells);
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            function highlightWinningCells(cells) {
+                cells.forEach(cell => {
+                    const cellEl = document.querySelector(`[data-row='${cell.row}'][data-col='${cell.col}']`);
+                    cellEl.classList.add('win');
+                });
+            }
+
+            function checkDraw() {
+                // Check if the top row (row 0) is full
+                return board[0].every(cell => cell !== 0);
+            }
+
+            function endGame(isDraw) {
+                gameOver = true;
+                if (isDraw) {
+                    winTextElement.textContent = "It's a Draw!";
+                    winTextElement.style.color = ''; // Reset color
+                } else {
+                    winTextElement.textContent = `Player ${currentPlayer} Wins!`;
+                    winTextElement.style.color = currentPlayer === 1 ? 'var(--player1-color)' : 'var(--player2-color)';
+                }
+                winMessageElement.classList.add('show');
+            }
+
+            function newGame() {
+                gameOver = false;
+                currentPlayer = 1;
+                winMessageElement.classList.remove('show');
+                createBoard();
+                updateTurnIndicator();
+            }
+
+            // --- Article Toggle Logic (Updated for smooth transition) ---
+            readMoreButton.addEventListener('click', () => {
+                const isHidden = fullArticleContent.classList.contains('hidden');
+                
+                if (isHidden) {
+                    // Show content: replace 'hidden' with 'show' and update button text
+                    fullArticleContent.classList.remove('hidden');
+                    // Timeout allows the DOM to render the block before applying CSS transition
+                    setTimeout(() => {
+                        fullArticleContent.classList.add('show');
+                        readMoreButton.textContent = 'Read Less';
+                        readMoreButton.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 10);
+                } else {
+                    // Hide content: apply CSS transition first, then hide the block
+                    fullArticleContent.classList.remove('show');
+                    readMoreButton.textContent = 'Read More';
+                    setTimeout(() => {
+                        fullArticleContent.classList.add('hidden');
+                    }, 700); // Must match the CSS transition time
+                }
+            });
+
+
+            boardElement.addEventListener('click', handleColumnClick);
+            newGameBtn.addEventListener('click', newGame);
+            playAgainBtn.addEventListener('click', newGame);
+
+            newGame();
+        });
+    </script>
+
+</body>
+</html>
