@@ -1,20 +1,22 @@
 <div align="center">
-# 🚀 Connect Four Game
-### *High-Performance Interactive Web Experience & Canvas Engine*
 
-<p align="center">
-  [![Architect](https://img.shields.io/badge/Architect-Hsini%20Mohamed-0055ff?style=for-the-badge&logo=github&logoColor=white)](https://hsini.dev)
-  [![Portfolio](https://img.shields.io/badge/Portfolio-hsini.dev-00c853?style=for-the-badge&logo=google-chrome&logoColor=white)](https://hsini.dev)
-  [![Language](https://img.shields.io/badge/Language-HTML-f59e0b?style=for-the-badge)](https://github.com/hsinidev)
-  [![Framework](https://img.shields.io/badge/Framework-WebGL%20/%20HTML5%20Canvas-6366f1?style=for-the-badge)](https://github.com/hsinidev)
-  [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
-</p>
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=0,2,2,5,30&height=180&section=header&text=Connect%20Four%20Game&fontSize=42&fontColor=fff&animation=fadeIn&fontAlignY=38" width="100%" style="max-width: 100%; border-radius: 12px; margin-bottom: 20px;" alt="Connect Four Game Header Banner" />
 
-![Connect Four Gameplay](https://placehold.co/800x450/0f172a/e2e8f0?text=Connect+Four+Gameplay)
+  <h1>🚀 Connect Four Game</h1>
+  <p><em>High-Performance Interactive Web Experience & Canvas Engine</em></p>
+
+  <p align="center">
+    <a href="https://hsini.dev"><img src="https://img.shields.io/badge/Architect-Hsini%20Mohamed-0055ff?style=for-the-badge&logo=github&logoColor=white" alt="Architect: Hsini Mohamed" /></a>
+    <a href="https://hsini.dev"><img src="https://img.shields.io/badge/Portfolio-hsini.dev-00c853?style=for-the-badge&logo=google-chrome&logoColor=white" alt="Portfolio: hsini.dev" /></a>
+    <a href="https://github.com/hsinidev"><img src="https://img.shields.io/badge/Language-HTML-e34c26?style=for-the-badge" alt="Language: HTML" /></a>
+    <a href="https://github.com/hsinidev"><img src="https://img.shields.io/badge/Framework-WebGL%20/%20HTML5%20Canvas-6366f1?style=for-the-badge" alt="Framework: WebGL / HTML5 Canvas" /></a>
+    <a href="https://github.com/hsinidev/Connect-Four-Game"><img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License: MIT" /></a>
+  </p>
 
 </div>
 
 ---
+
 ## 🌟 Executive Overview
 
 **Connect Four Game** delivers a fast, responsive, and cross-platform browser experience built with **HTML** and hardware-accelerated canvas rendering.
@@ -27,6 +29,7 @@
 - **Local Storage State**: Automatic session persistence and state restoration.
 
 ---
+
 ## 🏗️ Architecture & Technology Stack
 
 - **Primary Language**: `HTML`
@@ -34,56 +37,6 @@
 - **Design Pattern**: Modular Clean Architecture / Domain-Driven Design
 - **License**: MIT Open Source Attribution
 
-## 📖 Deep-Dive Technical Documentation
-
-# Connect Four Game
-
-A fully playable, single-file HTML, CSS, and JavaScript implementation of the classic two-player game Connect Four. This project features a visually striking dark theme, smooth animations, and is fully responsive for both mobile and desktop play.
-
-**Live Demo:** [**Connect4.fighterplay.com**](https://Connect4.fighterplay.com)
-
-![Connect Four Gameplay](https://placehold.co/800x450/0f172a/e2e8f0?text=Connect+Four+Gameplay)
-
-## Features
-
-- **Single File Implementation:** All HTML, CSS, and JavaScript are contained within a single `index.html` file for simplicity and portability.
-- **Stunning Visuals:** A modern, dark "galaxy" theme with smooth CSS animations for dropping pieces.
-- **Robust Game Logic:**
-    - Turn-based gameplay for two players (Red vs. Yellow).
-    - Accurate win condition checking (horizontal, vertical, and diagonal).
-    - Draw condition detection.
-- **Fully Responsive:** Looks and plays great on any device, from mobile phones to desktops.
-- **SEO Optimized:** Includes a detailed article blueprint with JSON-LD schema, `robots.txt`, and a `sitemap.xml` to maximize search engine visibility.
-- **User-Friendly Controls:** Simple "New Game" and "Play Again" buttons for easy game management.
-
-## Technology Stack
-
-- **HTML5:** For the core structure and content.
-- **CSS3:** For all styling, animations, and responsive design.
-- **JavaScript (ES6):** For the complete game logic and DOM manipulation.
-- **Tailwind CSS (via CDN):** Used for styling the embedded SEO article.
-
-## How to Run Locally
-
-No build process or server is needed. Simply clone the repository and open the `index.html` file in your favorite web browser.
-
-```bash
-git clone https://github.com/hsinidev/Connect-Four-Game.git
-cd Connect-Four-Game
-# Open index.html in your browser
-```
-
-## Project Purpose
-
-This project was created to demonstrate a complete, polished, and SEO-friendly web application built with fundamental web technologies. It also includes a comprehensive blueprint for a more advanced 3D version, serving as a deep-dive article for game development enthusiasts.
-
-
-
----
-
-Powered by [**HSINI MOHAMED**](https://github.com/hsinidev)
-
----
 ## 🚀 Quick Start & Installation
 
 ### 1. Clone the Repository
